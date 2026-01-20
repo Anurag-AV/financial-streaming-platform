@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package stock;
+option go_package = "github.com/Anurag-AV/financial-streaming-platform/proto";
+
+// Request message for getting stock price
+message StockRequest {
+    string symbol = 1;
+}
+
+// Stock tick data with financial details
+message StockTick {
+    string symbol = 1;           // Stock symbol (e.g., "AAPL")
+    double price = 2;            // Current price
+    int64 volume = 3;            // Trade volume
+    double bid = 4;              // Bid price
+    double ask = 5;              // Ask price
+    int64 timestamp = 6;         // Unix timestamp (nanoseconds)
+    string trade_type = 7;       // "BUY" or "SELL"
+    int32 market_depth = 8;      // Number of orders in book
+}
+
+// Stock service definition
+service StockService {
+    // Simple unary RPC - request one stock price
+    rpc GetStockPrice(StockRequest) returns (StockTick);
+}
