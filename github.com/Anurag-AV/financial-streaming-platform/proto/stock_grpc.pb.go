@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StockService_GetStockPrice_FullMethodName = "/stock.StockService/GetStockPrice"
+	StockService_GetStockPrice_FullMethodName        = "/stock.StockService/GetStockPrice"
+	StockService_StreamMarketData_FullMethodName     = "/stock.StockService/StreamMarketData"
+	StockService_SubscribePriceAlerts_FullMethodName = "/stock.StockService/SubscribePriceAlerts"
 )
 
 // StockServiceClient is the client API for StockService service.
@@ -30,6 +32,10 @@ const (
 type StockServiceClient interface {
 	// Simple unary RPC - request one stock price
 	GetStockPrice(ctx context.Context, in *StockRequest, opts ...grpc.CallOption) (*StockTick, error)
+	// Stream continuous market data updates (server streaming RPC)
+	StreamMarketData(ctx context.Context, in *StreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StockTick], error)
+	// Subscribe to price alerts (bidirectional streaming)
+	SubscribePriceAlerts(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[PriceAlertRequest, PriceAlert], error)
 }
 
 type stockServiceClient struct {
@@ -50,6 +56,38 @@ func (c *stockServiceClient) GetStockPrice(ctx context.Context, in *StockRequest
 	return out, nil
 }
 
+func (c *stockServiceClient) StreamMarketData(ctx context.Context, in *StreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StockTick], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &StockService_ServiceDesc.Streams[0], StockService_StreamMarketData_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamRequest, StockTick]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StockService_StreamMarketDataClient = grpc.ServerStreamingClient[StockTick]
+
+func (c *stockServiceClient) SubscribePriceAlerts(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[PriceAlertRequest, PriceAlert], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &StockService_ServiceDesc.Streams[1], StockService_SubscribePriceAlerts_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[PriceAlertRequest, PriceAlert]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StockService_SubscribePriceAlertsClient = grpc.BidiStreamingClient[PriceAlertRequest, PriceAlert]
+
 // StockServiceServer is the server API for StockService service.
 // All implementations must embed UnimplementedStockServiceServer
 // for forward compatibility.
@@ -58,6 +96,10 @@ func (c *stockServiceClient) GetStockPrice(ctx context.Context, in *StockRequest
 type StockServiceServer interface {
 	// Simple unary RPC - request one stock price
 	GetStockPrice(context.Context, *StockRequest) (*StockTick, error)
+	// Stream continuous market data updates (server streaming RPC)
+	StreamMarketData(*StreamRequest, grpc.ServerStreamingServer[StockTick]) error
+	// Subscribe to price alerts (bidirectional streaming)
+	SubscribePriceAlerts(grpc.BidiStreamingServer[PriceAlertRequest, PriceAlert]) error
 	mustEmbedUnimplementedStockServiceServer()
 }
 
@@ -70,6 +112,12 @@ type UnimplementedStockServiceServer struct{}
 
 func (UnimplementedStockServiceServer) GetStockPrice(context.Context, *StockRequest) (*StockTick, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetStockPrice not implemented")
+}
+func (UnimplementedStockServiceServer) StreamMarketData(*StreamRequest, grpc.ServerStreamingServer[StockTick]) error {
+	return status.Error(codes.Unimplemented, "method StreamMarketData not implemented")
+}
+func (UnimplementedStockServiceServer) SubscribePriceAlerts(grpc.BidiStreamingServer[PriceAlertRequest, PriceAlert]) error {
+	return status.Error(codes.Unimplemented, "method SubscribePriceAlerts not implemented")
 }
 func (UnimplementedStockServiceServer) mustEmbedUnimplementedStockServiceServer() {}
 func (UnimplementedStockServiceServer) testEmbeddedByValue()                      {}
@@ -110,6 +158,24 @@ func _StockService_GetStockPrice_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StockService_StreamMarketData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(StockServiceServer).StreamMarketData(m, &grpc.GenericServerStream[StreamRequest, StockTick]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StockService_StreamMarketDataServer = grpc.ServerStreamingServer[StockTick]
+
+func _StockService_SubscribePriceAlerts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(StockServiceServer).SubscribePriceAlerts(&grpc.GenericServerStream[PriceAlertRequest, PriceAlert]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StockService_SubscribePriceAlertsServer = grpc.BidiStreamingServer[PriceAlertRequest, PriceAlert]
+
 // StockService_ServiceDesc is the grpc.ServiceDesc for StockService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +188,18 @@ var StockService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _StockService_GetStockPrice_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamMarketData",
+			Handler:       _StockService_StreamMarketData_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "SubscribePriceAlerts",
+			Handler:       _StockService_SubscribePriceAlerts_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "proto/stock.proto",
 }

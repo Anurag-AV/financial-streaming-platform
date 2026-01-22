@@ -66,24 +66,226 @@ func (x *StockRequest) GetSymbol() string {
 	return ""
 }
 
+// Subscription request for streaming multiple stocks
+type StreamRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Symbols          []string               `protobuf:"bytes,1,rep,name=symbols,proto3" json:"symbols,omitempty"`                                              // List of stock symbols to stream
+	UpdateIntervalMs int32                  `protobuf:"varint,2,opt,name=update_interval_ms,json=updateIntervalMs,proto3" json:"update_interval_ms,omitempty"` // How often to send updates (milliseconds)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *StreamRequest) Reset() {
+	*x = StreamRequest{}
+	mi := &file_proto_stock_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamRequest) ProtoMessage() {}
+
+func (x *StreamRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_stock_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamRequest.ProtoReflect.Descriptor instead.
+func (*StreamRequest) Descriptor() ([]byte, []int) {
+	return file_proto_stock_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StreamRequest) GetSymbols() []string {
+	if x != nil {
+		return x.Symbols
+	}
+	return nil
+}
+
+func (x *StreamRequest) GetUpdateIntervalMs() int32 {
+	if x != nil {
+		return x.UpdateIntervalMs
+	}
+	return 0
+}
+
+// Price alert subscription
+type PriceAlertRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`                                // Stock symbol
+	TargetPrice   float64                `protobuf:"fixed64,2,opt,name=target_price,json=targetPrice,proto3" json:"target_price,omitempty"` // Price to trigger alert
+	Condition     string                 `protobuf:"bytes,3,opt,name=condition,proto3" json:"condition,omitempty"`                          // "ABOVE" or "BELOW"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PriceAlertRequest) Reset() {
+	*x = PriceAlertRequest{}
+	mi := &file_proto_stock_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PriceAlertRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PriceAlertRequest) ProtoMessage() {}
+
+func (x *PriceAlertRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_stock_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PriceAlertRequest.ProtoReflect.Descriptor instead.
+func (*PriceAlertRequest) Descriptor() ([]byte, []int) {
+	return file_proto_stock_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PriceAlertRequest) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *PriceAlertRequest) GetTargetPrice() float64 {
+	if x != nil {
+		return x.TargetPrice
+	}
+	return 0
+}
+
+func (x *PriceAlertRequest) GetCondition() string {
+	if x != nil {
+		return x.Condition
+	}
+	return ""
+}
+
+// Alert notification when price target is hit
+type PriceAlert struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	CurrentPrice  float64                `protobuf:"fixed64,2,opt,name=current_price,json=currentPrice,proto3" json:"current_price,omitempty"`
+	TargetPrice   float64                `protobuf:"fixed64,3,opt,name=target_price,json=targetPrice,proto3" json:"target_price,omitempty"`
+	Condition     string                 `protobuf:"bytes,4,opt,name=condition,proto3" json:"condition,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Message       string                 `protobuf:"bytes,6,opt,name=message,proto3" json:"message,omitempty"` // Human-readable alert message
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PriceAlert) Reset() {
+	*x = PriceAlert{}
+	mi := &file_proto_stock_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PriceAlert) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PriceAlert) ProtoMessage() {}
+
+func (x *PriceAlert) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_stock_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PriceAlert.ProtoReflect.Descriptor instead.
+func (*PriceAlert) Descriptor() ([]byte, []int) {
+	return file_proto_stock_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PriceAlert) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *PriceAlert) GetCurrentPrice() float64 {
+	if x != nil {
+		return x.CurrentPrice
+	}
+	return 0
+}
+
+func (x *PriceAlert) GetTargetPrice() float64 {
+	if x != nil {
+		return x.TargetPrice
+	}
+	return 0
+}
+
+func (x *PriceAlert) GetCondition() string {
+	if x != nil {
+		return x.Condition
+	}
+	return ""
+}
+
+func (x *PriceAlert) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *PriceAlert) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 // Stock tick data with financial details
 type StockTick struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`                               // Stock symbol (e.g., "AAPL")
-	Price         float64                `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`                               // Current price
-	Volume        int64                  `protobuf:"varint,3,opt,name=volume,proto3" json:"volume,omitempty"`                              // Trade volume
-	Bid           float64                `protobuf:"fixed64,4,opt,name=bid,proto3" json:"bid,omitempty"`                                   // Bid price
-	Ask           float64                `protobuf:"fixed64,5,opt,name=ask,proto3" json:"ask,omitempty"`                                   // Ask price
-	Timestamp     int64                  `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                        // Unix timestamp (nanoseconds)
-	TradeType     string                 `protobuf:"bytes,7,opt,name=trade_type,json=tradeType,proto3" json:"trade_type,omitempty"`        // "BUY" or "SELL"
-	MarketDepth   int32                  `protobuf:"varint,8,opt,name=market_depth,json=marketDepth,proto3" json:"market_depth,omitempty"` // Number of orders in book
+	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`                                       // Stock symbol (e.g., "AAPL")
+	Price         float64                `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`                                       // Current price
+	Volume        int64                  `protobuf:"varint,3,opt,name=volume,proto3" json:"volume,omitempty"`                                      // Trade volume
+	Bid           float64                `protobuf:"fixed64,4,opt,name=bid,proto3" json:"bid,omitempty"`                                           // Bid price
+	Ask           float64                `protobuf:"fixed64,5,opt,name=ask,proto3" json:"ask,omitempty"`                                           // Ask price
+	Timestamp     int64                  `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                // Unix timestamp (nanoseconds)
+	TradeType     string                 `protobuf:"bytes,7,opt,name=trade_type,json=tradeType,proto3" json:"trade_type,omitempty"`                // "BUY" or "SELL"
+	MarketDepth   int32                  `protobuf:"varint,8,opt,name=market_depth,json=marketDepth,proto3" json:"market_depth,omitempty"`         // Number of orders in book
+	DayHigh       float64                `protobuf:"fixed64,9,opt,name=day_high,json=dayHigh,proto3" json:"day_high,omitempty"`                    // Day's high price
+	DayLow        float64                `protobuf:"fixed64,10,opt,name=day_low,json=dayLow,proto3" json:"day_low,omitempty"`                      // Day's low price
+	ChangePercent float64                `protobuf:"fixed64,11,opt,name=change_percent,json=changePercent,proto3" json:"change_percent,omitempty"` // Percent change from open
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StockTick) Reset() {
 	*x = StockTick{}
-	mi := &file_proto_stock_proto_msgTypes[1]
+	mi := &file_proto_stock_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -95,7 +297,7 @@ func (x *StockTick) String() string {
 func (*StockTick) ProtoMessage() {}
 
 func (x *StockTick) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_stock_proto_msgTypes[1]
+	mi := &file_proto_stock_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +310,7 @@ func (x *StockTick) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StockTick.ProtoReflect.Descriptor instead.
 func (*StockTick) Descriptor() ([]byte, []int) {
-	return file_proto_stock_proto_rawDescGZIP(), []int{1}
+	return file_proto_stock_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *StockTick) GetSymbol() string {
@@ -167,13 +369,49 @@ func (x *StockTick) GetMarketDepth() int32 {
 	return 0
 }
 
+func (x *StockTick) GetDayHigh() float64 {
+	if x != nil {
+		return x.DayHigh
+	}
+	return 0
+}
+
+func (x *StockTick) GetDayLow() float64 {
+	if x != nil {
+		return x.DayLow
+	}
+	return 0
+}
+
+func (x *StockTick) GetChangePercent() float64 {
+	if x != nil {
+		return x.ChangePercent
+	}
+	return 0
+}
+
 var File_proto_stock_proto protoreflect.FileDescriptor
 
 const file_proto_stock_proto_rawDesc = "" +
 	"\n" +
 	"\x11proto/stock.proto\x12\x05stock\"&\n" +
 	"\fStockRequest\x12\x16\n" +
-	"\x06symbol\x18\x01 \x01(\tR\x06symbol\"\xd5\x01\n" +
+	"\x06symbol\x18\x01 \x01(\tR\x06symbol\"W\n" +
+	"\rStreamRequest\x12\x18\n" +
+	"\asymbols\x18\x01 \x03(\tR\asymbols\x12,\n" +
+	"\x12update_interval_ms\x18\x02 \x01(\x05R\x10updateIntervalMs\"l\n" +
+	"\x11PriceAlertRequest\x12\x16\n" +
+	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12!\n" +
+	"\ftarget_price\x18\x02 \x01(\x01R\vtargetPrice\x12\x1c\n" +
+	"\tcondition\x18\x03 \x01(\tR\tcondition\"\xc2\x01\n" +
+	"\n" +
+	"PriceAlert\x12\x16\n" +
+	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12#\n" +
+	"\rcurrent_price\x18\x02 \x01(\x01R\fcurrentPrice\x12!\n" +
+	"\ftarget_price\x18\x03 \x01(\x01R\vtargetPrice\x12\x1c\n" +
+	"\tcondition\x18\x04 \x01(\tR\tcondition\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x18\n" +
+	"\amessage\x18\x06 \x01(\tR\amessage\"\xb0\x02\n" +
 	"\tStockTick\x12\x16\n" +
 	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x01R\x05price\x12\x16\n" +
@@ -183,9 +421,15 @@ const file_proto_stock_proto_rawDesc = "" +
 	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\x12\x1d\n" +
 	"\n" +
 	"trade_type\x18\a \x01(\tR\ttradeType\x12!\n" +
-	"\fmarket_depth\x18\b \x01(\x05R\vmarketDepth2F\n" +
+	"\fmarket_depth\x18\b \x01(\x05R\vmarketDepth\x12\x19\n" +
+	"\bday_high\x18\t \x01(\x01R\adayHigh\x12\x17\n" +
+	"\aday_low\x18\n" +
+	" \x01(\x01R\x06dayLow\x12%\n" +
+	"\x0echange_percent\x18\v \x01(\x01R\rchangePercent2\xcd\x01\n" +
 	"\fStockService\x126\n" +
-	"\rGetStockPrice\x12\x13.stock.StockRequest\x1a\x10.stock.StockTickB9Z7github.com/Anurag-AV/financial-streaming-platform/protob\x06proto3"
+	"\rGetStockPrice\x12\x13.stock.StockRequest\x1a\x10.stock.StockTick\x12<\n" +
+	"\x10StreamMarketData\x12\x14.stock.StreamRequest\x1a\x10.stock.StockTick0\x01\x12G\n" +
+	"\x14SubscribePriceAlerts\x12\x18.stock.PriceAlertRequest\x1a\x11.stock.PriceAlert(\x010\x01B9Z7github.com/Anurag-AV/financial-streaming-platform/protob\x06proto3"
 
 var (
 	file_proto_stock_proto_rawDescOnce sync.Once
@@ -199,16 +443,23 @@ func file_proto_stock_proto_rawDescGZIP() []byte {
 	return file_proto_stock_proto_rawDescData
 }
 
-var file_proto_stock_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_stock_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_stock_proto_goTypes = []any{
-	(*StockRequest)(nil), // 0: stock.StockRequest
-	(*StockTick)(nil),    // 1: stock.StockTick
+	(*StockRequest)(nil),      // 0: stock.StockRequest
+	(*StreamRequest)(nil),     // 1: stock.StreamRequest
+	(*PriceAlertRequest)(nil), // 2: stock.PriceAlertRequest
+	(*PriceAlert)(nil),        // 3: stock.PriceAlert
+	(*StockTick)(nil),         // 4: stock.StockTick
 }
 var file_proto_stock_proto_depIdxs = []int32{
 	0, // 0: stock.StockService.GetStockPrice:input_type -> stock.StockRequest
-	1, // 1: stock.StockService.GetStockPrice:output_type -> stock.StockTick
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 1: stock.StockService.StreamMarketData:input_type -> stock.StreamRequest
+	2, // 2: stock.StockService.SubscribePriceAlerts:input_type -> stock.PriceAlertRequest
+	4, // 3: stock.StockService.GetStockPrice:output_type -> stock.StockTick
+	4, // 4: stock.StockService.StreamMarketData:output_type -> stock.StockTick
+	3, // 5: stock.StockService.SubscribePriceAlerts:output_type -> stock.PriceAlert
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -225,7 +476,7 @@ func file_proto_stock_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_stock_proto_rawDesc), len(file_proto_stock_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -8,6 +8,29 @@ message StockRequest {
     string symbol = 1;
 }
 
+// Subscription request for streaming multiple stocks
+message StreamRequest {
+    repeated string symbols = 1;      // List of stock symbols to stream
+    int32 update_interval_ms = 2;     // How often to send updates (milliseconds)
+}
+
+// Price alert subscription
+message PriceAlertRequest {
+    string symbol = 1;                // Stock symbol
+    double target_price = 2;          // Price to trigger alert
+    string condition = 3;             // "ABOVE" or "BELOW"
+}
+
+// Alert notification when price target is hit
+message PriceAlert {
+    string symbol = 1;
+    double current_price = 2;
+    double target_price = 3;
+    string condition = 4;
+    int64 timestamp = 5;
+    string message = 6;               // Human-readable alert message
+}
+
 // Stock tick data with financial details
 message StockTick {
     string symbol = 1;           // Stock symbol (e.g., "AAPL")
@@ -18,10 +41,19 @@ message StockTick {
     int64 timestamp = 6;         // Unix timestamp (nanoseconds)
     string trade_type = 7;       // "BUY" or "SELL"
     int32 market_depth = 8;      // Number of orders in book
+    double day_high = 9;              // Day's high price
+    double day_low = 10;              // Day's low price
+    double change_percent = 11;       // Percent change from open
 }
 
 // Stock service definition
 service StockService {
     // Simple unary RPC - request one stock price
     rpc GetStockPrice(StockRequest) returns (StockTick);
+
+    // Stream continuous market data updates (server streaming RPC)
+    rpc StreamMarketData(StreamRequest) returns (stream StockTick);
+    
+    //Subscribe to price alerts (bidirectional streaming)
+    rpc SubscribePriceAlerts(stream PriceAlertRequest) returns (stream PriceAlert);
 }
