@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package analytics;
+option go_package = "github.com/Anurag-AV/financial-streaming-platform/proto";
+
+import "proto/processor.proto";
+
+// ============= Messages =============
+
+// Request for analytics data
+message AnalyticsRequest {
+    repeated string symbols = 1;
+    int32 time_window_minutes = 2;  // How far back to analyze
+}
+
+// Portfolio analytics
+message PortfolioAnalytics {
+    repeated string symbols = 1;
+    double total_value = 2;
+    double total_return = 3;
+    double portfolio_volatility = 4;
+    double sharpe_ratio = 5;
+    double value_at_risk_95 = 6;      // VaR at 95% confidence
+    double value_at_risk_99 = 7;      // VaR at 99% confidence
+    int64 timestamp = 8;
+}
+
+// Risk metrics for a single symbol
+message RiskMetrics {
+    string symbol = 1;
+    double volatility = 2;              // Price volatility %
+    double sharpe_ratio = 3;            // Risk-adjusted return
+    double beta = 4;                    // Relative to market
+    double value_at_risk_95 = 5;
+    double value_at_risk_99 = 6;
+    double max_drawdown = 7;            // Largest peak-to-trough decline
+    double expected_return = 8;         // Annualized return estimate
+    int64 timestamp = 9;
+}
+
+// Correlation between two symbols
+message CorrelationPair {
+    string symbol1 = 1;
+    string symbol2 = 2;
+    double correlation = 3;             // -1 to 1
+    int32 sample_size = 4;
+}
+
+// Correlation matrix
+message CorrelationMatrix {
+    repeated string symbols = 1;
+    repeated CorrelationPair pairs = 2;
+    int64 timestamp = 3;
+}
+
+// Trading signal
+message TradingSignal {
+    string symbol = 1;
+    string signal_type = 2;             // "BUY", "SELL", "HOLD"
+    double confidence = 3;              // 0-1
+    string reason = 4;                  // Why this signal
+    double target_price = 5;
+    int64 timestamp = 6;
+}
+
+// Performance metrics (for benchmarking)
+message PerformanceMetrics {
+    string api_type = 1;                // "gRPC" or "REST"
+    double avg_latency_ms = 2;
+    double p50_latency_ms = 3;
+    double p95_latency_ms = 4;
+    double p99_latency_ms = 5;
+    int64 request_count = 6;
+    double throughput_rps = 7;          // Requests per second
+    int64 avg_payload_bytes = 8;
+    int64 timestamp = 9;
+}
+
+// ============= Services =============
+
+service AnalyticsService {
+    // Get portfolio analytics
+    rpc GetPortfolioAnalytics(AnalyticsRequest) returns (PortfolioAnalytics);
+    
+    // Get risk metrics for symbols
+    rpc GetRiskMetrics(AnalyticsRequest) returns (stream RiskMetrics);
+    
+    // Get correlation matrix
+    rpc GetCorrelationMatrix(AnalyticsRequest) returns (CorrelationMatrix);
+    
+    // Get trading signals
+    rpc GetTradingSignals(AnalyticsRequest) returns (stream TradingSignal);
+    
+    // Get performance comparison metrics
+    rpc GetPerformanceMetrics(AnalyticsRequest) returns (PerformanceMetrics);
+}
